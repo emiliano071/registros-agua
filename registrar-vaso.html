@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Registrar vaso</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💧</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1:#081420; --bg-2:#0E2534;
+    --surface:#0F2A3B; --border:rgba(255,255,255,.08);
+    --accent:#5EEAD4; --accent-2:#22D3EE; --warm:#FDBA74;
+    --text:#EAF3F2; --text-dim:#82A6B0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(900px 500px at 50% 0%, rgba(34,211,238,.16), transparent 60%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-2) 60%, #081119);
+    color:var(--text);font-family:'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing:antialiased;padding:24px;
+  }
+  .card{
+    width:100%;max-width:340px;text-align:center;
+    background:var(--surface);border:1px solid var(--border);border-radius:28px;
+    padding:36px 26px 30px;box-shadow:0 20px 60px -20px rgba(0,0,0,.6);
+    position:relative;z-index:1;
+  }
+  .light-glints{
+    position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+  }
+  .light-glints::before,
+  .light-glints::after{
+    content:"";position:absolute;width:65%;height:65%;border-radius:50%;
+    filter:blur(30px);
+  }
+  .light-glints::before{
+    top:-15%;left:-12%;
+    background:radial-gradient(circle, rgba(94,234,212,.11), transparent 70%);
+    animation:driftGlint 26s ease-in-out infinite alternate;
+  }
+  .light-glints::after{
+    bottom:-22%;right:-16%;
+    background:radial-gradient(circle, rgba(34,211,238,.09), transparent 70%);
+    animation:driftGlint 33s ease-in-out infinite alternate;
+    animation-delay:-9s;
+  }
+  @keyframes driftGlint{
+    0%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(5%,4%) scale(1.1);}
+    100%{transform:translate(-4%,-3%) scale(.94);}
+  }
+  .icon-wrap{
+    width:84px;height:84px;margin:0 auto 18px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:38px;
+    background:radial-gradient(circle at 35% 30%, rgba(94,234,212,.25), rgba(94,234,212,.05));
+    border:1px solid rgba(94,234,212,.3);
+    transition:transform .5s cubic-bezier(.34,1.56,.64,1);
+  }
+  .icon-wrap.pop{transform:scale(1.12);}
+  h1{
+    font-family:'Fraunces', serif;font-weight:700;font-size:23px;margin:0 0 6px;
+  }
+  p.msg{color:var(--text-dim);font-size:14.5px;margin:0 0 20px;line-height:1.4;}
+  .count-badge{
+    display:inline-flex;align-items:baseline;gap:4px;
+    background:rgba(255,255,255,.05);border:1px solid var(--border);
+    padding:8px 16px;border-radius:14px;margin-bottom:22px;
+  }
+  .count-badge b{font-family:'Fraunces',serif;font-size:22px;font-weight:700;}
+  .count-badge span{color:var(--text-dim);font-size:13px;}
+  button.action{
+    width:100%;border:none;border-radius:16px;padding:15px;
+    font-family:'Inter';font-weight:600;font-size:15px;cursor:pointer;
+    background:linear-gradient(135deg, var(--accent-2), var(--accent));
+    color:#052227;transition:transform .15s ease, opacity .2s ease;
+  }
+  button.action:active{transform:scale(.97);}
+  button.action:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+  button.action[disabled]{opacity:.5;cursor:default;}
+  button.ghost{
+    background:none;border:1px solid var(--border);color:var(--text-dim);
+    margin-top:10px;
+  }
+  .state{display:none;}
+  .state.active{display:block;}
+  .spinner{
+    width:34px;height:34px;border-radius:50%;margin:0 auto 16px;
+    border:3px solid rgba(255,255,255,.15);border-top-color:var(--accent);
+    animation:spin 1s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @media (prefers-reduced-motion: reduce){
+    .icon-wrap{transition:none;}
+    .spinner{animation-duration:1.6s;}
+    .light-glints::before,.light-glints::after{animation:none;}
+  }
+</style>
+</head>
+<body>
+  <div class="light-glints" aria-hidden="true"></div>
+  <div class="card">
+
+    <div id="stateLoading" class="state active">
+      <div class="spinner"></div>
+      <h1>Registrando…</h1>
+      <p class="msg">Sumando tu vaso de agua</p>
+    </div>
+
+    <div id="stateSuccess" class="state">
+      <div class="icon-wrap" id="successIcon">💧</div>
+      <h1>¡Vaso registrado!</h1>
+      <p class="msg" id="successMsg">Bien hecho, sigue así.</p>
+      <div class="count-badge"><b id="countToday">–</b><span>vasos hoy</span></div>
+      <button class="action ghost" id="addMoreBtn" type="button">+ Sumar otro vaso</button>
+    </div>
+
+    <div id="stateRecent" class="state">
+      <div class="icon-wrap">✅</div>
+      <h1>Ya estaba registrado</h1>
+      <p class="msg">Tu último vaso se registró hace unos segundos.</p>
+      <div class="count-badge"><b id="countToday2">–</b><span>vasos hoy</span></div>
+      <button class="action" id="addAnywayBtn" type="button">Sumar uno más igual</button>
+    </div>
+
+    <div id="stateError" class="state">
+      <div class="icon-wrap">⚠️</div>
+      <h1>No se pudo registrar</h1>
+      <p class="msg" id="errorMsg">Revisa tu conexión e inténtalo de nuevo.</p>
+      <button class="action" id="retryBtn" type="button">Reintentar</button>
+    </div>
+
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="config.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const cfg = window.AGUA_CONFIG || {};
+  const GOAL = cfg.DAILY_GOAL_GLASSES || 8;
+  const DEBOUNCE_MS = 8000;
+  const LAST_LOG_KEY = 'agua_last_log_ts';
+
+  const states = {
+    loading: document.getElementById('stateLoading'),
+    success: document.getElementById('stateSuccess'),
+    recent: document.getElementById('stateRecent'),
+    error: document.getElementById('stateError'),
+  };
+  function show(name){
+    Object.values(states).forEach(s => s.classList.remove('active'));
+    states[name].classList.add('active');
+  }
+
+  const isConfigured = cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes('PEGA_AQUI') &&
+                        cfg.SUPABASE_ANON_KEY && !cfg.SUPABASE_ANON_KEY.includes('PEGA_AQUI');
+
+  function localDateKey(d){
+    const off = d.getTimezoneOffset();
+    const local = new Date(d.getTime() - off*60000);
+    return local.toISOString().slice(0,10);
+  }
+
+  function buzz(){
+    try{ if (navigator.vibrate) navigator.vibrate(45); }catch(e){}
+  }
+
+  async function fetchTodayCount(client){
+    const { data, error } = await client.from('water_logs').select('logged_at');
+    if (error || !data) return null;
+    const todayKey = localDateKey(new Date());
+    return data.filter(l => localDateKey(new Date(l.logged_at)) === todayKey).length;
+  }
+
+  async function logGlass({ force }){
+    show('loading');
+    const last = Number(localStorage.getItem(LAST_LOG_KEY) || 0);
+    const now = Date.now();
+    if (!force && (now - last) < DEBOUNCE_MS){
+      if (isConfigured){
+        try{
+          const client = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+          const count = await fetchTodayCount(client);
+          document.getElementById('countToday2').textContent = count ?? '–';
+        }catch(e){}
+      } else {
+        document.getElementById('countToday2').textContent = '–';
+      }
+      show('recent');
+      return;
+    }
+
+    if (!isConfigured){
+      // modo demo: no hay Supabase configurado todavía
+      localStorage.setItem(LAST_LOG_KEY, String(now));
+      document.getElementById('successMsg').textContent = 'Modo demostración — conecta tu Supabase en config.js';
+      document.getElementById('countToday').textContent = '–';
+      show('success');
+      pop();
+      buzz();
+      return;
+    }
+
+    try{
+      const client = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+      const { data, error } = await client.rpc('log_water', { p_token: cfg.SECRET_TOKEN });
+      if (error) throw error;
+      if (!data || data.success !== true){
+        throw new Error(data && data.error === 'invalid_token' ? 'Token inválido' : 'No se pudo registrar');
+      }
+      localStorage.setItem(LAST_LOG_KEY, String(now));
+      const count = await fetchTodayCount(client);
+      document.getElementById('successMsg').textContent = 'Bien hecho, sigue así.';
+      document.getElementById('countToday').textContent = count ?? '–';
+      show('success');
+      pop();
+      buzz();
+    } catch(err){
+      document.getElementById('errorMsg').textContent =
+        (err && err.message === 'Token inválido')
+          ? 'El token secreto no coincide con el de Supabase.'
+          : 'Revisa tu conexión e inténtalo de nuevo.';
+      show('error');
+    }
+  }
+
+  function pop(){
+    const icon = document.getElementById('successIcon');
+    icon.classList.add('pop');
+    setTimeout(() => icon.classList.remove('pop'), 500);
+  }
+
+  document.getElementById('retryBtn').addEventListener('click', () => logGlass({ force:false }));
+  document.getElementById('addMoreBtn').addEventListener('click', () => logGlass({ force:true }));
+  document.getElementById('addAnywayBtn').addEventListener('click', () => logGlass({ force:true }));
+
+  logGlass({ force:false });
+});
+</script>
+</body>
+</html>
